@@ -1,0 +1,163 @@
+  10 REM ============================================
+  20 REM  MINI EXPERT SYSTEM (SINCLAIR BASIC)
+  30 REM  DIAGNOSIS: PROBLEMS LOADING FROM TAPE
+  40 REM  Facts: -1 unknown, 0 false, 1 true
+  50 REM ============================================
+
+  55 LET NOBS=7:REM Observable facts: 1..7
+  56 LET MAXF=50:REM supported facts
+  57 LET MAXR=50:REM supported rules
+
+  60 DIM F(MAXF)
+  70 DIM C(MAXR): DIM D(MAXR): DIM E(MAXR)
+
+  80 REM --- LOAD RULES (Knowledge Base) ---
+  90 LET NR=0
+ 100 LET NF=NOBS
+ 110 RESTORE 9000
+
+ 120 REM Read rules until DATA 0,0,0
+ 130 READ A,B,T
+ 140 IF A=0 AND B=0 AND T=0 THEN GO TO 200
+
+ 150 LET NR=NR+1
+ 160 LET C(NR)=A: LET D(NR)=B: LET E(NR)=T
+
+ 170 LET X=ABS A: IF X>NF THEN LET NF=X
+ 175 LET X=ABS B: IF X>NF THEN LET NF=X
+ 180 IF T>NF THEN LET NF=T
+
+ 190 GO TO 130
+
+ 200 REM --- INITIALIZE FACTS ---
+ 210 FOR I=1 TO NF: LET F(I)=-1: NEXT I
+
+ 220 CLS
+ 230 PRINT "EXPERT SYSTEM:"
+ 240 PRINT "TAPE LOADING"
+ 250 PRINT "Answer Y or N in capitals"
+ 260 PRINT
+
+ 270 REM --- OBSERVABLE FACTS (Working Memory) ---
+ 280 GO SUB 2000
+
+ 290 REM --- INFERENCE ENGINE ---
+ 300 GO SUB 3000
+
+ 310 REM --- FINAL REPORT ---
+ 320 GO SUB 4000
+ 330 PAUSE 0: STOP
+
+ 999 REM ============================================
+1000 REM 2000) QUESTIONS TO THE USER (base facts)
+1010 REM ============================================
+2000 PRINT "1)LOADING FROM TAPE? (Y/N)";
+2010 GO SUB 7000: LET F(1)=ANS
+2020 IF F(1)=0 THEN PRINT:PRINT "OK. This expert is for tape only.": STOP
+2030 PRINT
+2040 PRINT "2)IS THE PLAYER VOLUME HIGH?";
+2050 GO SUB 7000: LET F(2)=ANS
+2055 PRINT
+2060 PRINT "3)IS OUTPUT HEADPHONE/LINE OUT?";
+2070 GO SUB 7000: LET F(3)=ANS
+2075 PRINT
+2080 PRINT "4)CABLE CORRECT AND CONNECTED?";
+2090 GO SUB 7000: LET F(4)=ANS
+2095 PRINT
+2100 PRINT "5)LOADING STRIPES ON BORDER?";
+2110 GO SUB 7000: LET F(5)=ANS
+2115 PRINT
+2120 PRINT "6)'R Tape loading error' SHOWN?";
+2130 GO SUB 7000: LET F(6)=ANS
+2135 PRINT
+2140 PRINT "7)DOES ANOTHER TAPE FAIL TOO?";
+2150 GO SUB 7000: LET F(7)=ANS
+2155 PRINT
+2160 PRINT
+2170 RETURN
+
+2999 REM ============================================
+3000 REM 3000) INFERENCE ENGINE (chaining)
+3001 REM Rules: IF C1 and C2 THEN TH
+3002 REM If C2=0 it means "C1 only"
+3003 REM Supports negation: if C1=-4 => F(4) must be 0
+3004 REM ============================================
+3020 LET CAMBIO=0
+3030 FOR R=1 TO NR
+3040   LET OK=1
+
+3050   LET A=C(R)
+3060   IF A<>0 THEN IF A>0 THEN IF F(A)<>1 THEN LET OK=0
+3065   IF A<>0 THEN IF A<0 THEN IF F(-A)<>0 THEN LET OK=0
+
+3070   LET B=D(R)
+3080   IF B<>0 THEN IF B>0 THEN IF F(B)<>1 THEN LET OK=0
+3085   IF B<>0 THEN IF B<0 THEN IF F(-B)<>0 THEN LET OK=0
+
+3090   IF OK=1 THEN LET T=E(R): IF T>0 THEN IF F(T)<>1 THEN LET F(T)=1: LET CAMBIO=1
+3100 NEXT R
+
+3110 IF CAMBIO=1 THEN GO TO 3020
+3120 RETURN
+
+3999 REM ============================================
+4000 REM 4000) CONCLUSIONS AND RECOMMENDATIONS
+4010 REM ============================================
+4015 PRINT "--------------------------------"
+4020 PRINT "RESULT:" : PRINT
+
+4035 INK 1
+4040 IF F(8)=1 THEN PRINT "- Adjust VOL and try again."
+4050 IF F(9)=1 THEN PRINT "- Use LINE OUT, not MIC."
+4060 IF F(10)=1 THEN PRINT "- Check cable / EAR connector"
+4070 IF F(11)=1 THEN PRINT "- The tape may be demagnetized."
+4080 IF F(12)=1 THEN PRINT "- Possible head problem (azimuth)."
+4085 INK 0
+
+4090 LET ANY=0
+4100 FOR I=8 TO 12
+4110 IF F(I)=1 THEN LET ANY=1
+4120 NEXT I
+
+4135 INK 3
+4140 IF ANY=0 THEN PRINT "- Not enough evidence. Repeat and check connections."
+4145 INK 0
+
+4160 PRINT "--------------------------------"
+4170 RETURN
+
+6999 REM ============================================
+7000 REM 7000) Y/N READER (returns ANS=1 if Y, 0 if N)
+7001 REM ============================================
+7005 INPUT A$
+7015 IF A$="" THEN GO TO 7000
+7030 IF A$="Y" OR A$="y" THEN LET ANS=1: RETURN
+7040 IF A$="N" OR A$="n" THEN LET ANS=0: RETURN
+7050 PRINT "Answer Y or N."
+7060 GO TO 7000
+
+
+9000 REM ============================================
+9010 REM KNOWLEDGE BASE (RULES)
+9020 REM Format: C,D,E
+9030 REM ============================================
+
+9070 REM --- Error: basic conditional recommendations ---
+9080 DATA 6,-2,8:REM error + volume NOT high -> raise volume
+9090 DATA 6,-3,9:REM error + NOT line out -> use line out
+9100 DATA 6,-4,10:REM error + cable NOT OK -> check cable
+
+9110 REM --- Error: diagnosis ---
+9120 DATA 6,5,12:REM error + stripes -> head/azimuth
+9130 DATA 6,4,12:REM error + cable OK -> possible head/azimuth
+
+9140 REM --- Another tape fails: diagnosis ---
+9150 DATA 7,5,11:REM another tape fails + stripes -> bad/demagnetized tape
+9160 DATA 7,-5,10:REM another tape fails + NO stripes -> check cable/input
+
+9170 REM --- Reinforcements ---
+9180 DATA 5,-4,10:REM stripes + cable NOT OK -> check cable
+9190 DATA 5,4,12:REM stripes + cable OK -> azimuth likely
+9200 DATA 6,7,12:REM error + another tape fails -> head/azimuth likely
+
+9210 DATA 0,0,0:REM END OF RULES

@@ -1,0 +1,4 @@
+2000 DEFPROC genRand(n)
+2010   LOCAL i
+2020   FOR i = 1 TO n: LET a(i) = INT(RND * 1000): NEXT i
+2030 ENDPROC

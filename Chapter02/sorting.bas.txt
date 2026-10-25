@@ -1,0 +1,20 @@
+10 REM --- PERFORMANCE LAB: MAIN PROGRAM (sorting.bas) ---
+15 RUN AT 3: REM Set the Z80 to 28 MHz.
+20  LET n = 300
+30  DIM a(n)
+40  REM CALL THE FUNCTION THAT GENERATES RANDOM NUMBERS
+50  PROC genRand(n)
+60  PRINT "Sorting "; n; " elements..."
+70 LET tinicio= TIME
+80 REM CALL THE SORTING FUNCTION
+90  PROC bubbleSort(n)
+100 LET tfinal = TIME
+120 LET transcurrido = (tfinal - tinicio) / 50
+130 PRINT "Completed in "; transcurrido; " seconds."
+140 REM --- CHECK WHETHER THE ARRAY IS SORTED ---
+145 LET OK = 1
+150 FOR i=1 TO n-1
+160 IF a(i) > a(i+1) THEN LET OK =0
+170 NEXT i
+180 IF OK=1 THEN PRINT "Array correctly sorted.": ELSE PRINT "Sorting error."
+200 PAUSE 0: STOP

@@ -1,0 +1,20 @@
+10  REM steps3.bas - O(n^2) Stress Lab
+20  INPUT "Number of elements (N): "; n
+30  DIM a(n): REM Create the data array
+40  FOR i = 1 TO n: LET a(i) = INT(RND * 1000): NEXT i
+
+60  PRINT "Searching for duplicates in "; n; " elements..."
+
+70  REM Initial time read from FRAMES
+80  LET tinicio = PEEK 23672 + 256*PEEK 23673 + 65536*PEEK 23674
+
+90  FOR i = 1 TO n - 1
+100  FOR j = i + 1 TO n
+110    IF a(i) = a(j) THEN PRINT "Match at pos "; i; " and "; j
+120  NEXT j
+130 NEXT i
+
+150 LET tfinal = PEEK 23672 + 256*PEEK 23673 + 65536*PEEK 23674
+160 LET segundos = (tfinal - tinicio) / 50
+170 PRINT "---"
+180 PRINT "Process finished in "; segundos; " seconds."

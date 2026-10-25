@@ -1,0 +1,17 @@
+10  REM O(n**2) Stress Lab
+20  INPUT "Number of elements (N): "; n
+30  DIM a(n): REM Create the data array 
+40  FOR i = 1 TO n: LET a(i) = INT(RND * 1000): NEXT i
+
+60  PRINT "Searching for duplicates in "; n; " elements..."
+70  REM Start the operation counter
+80  LET pasos=0
+90  FOR i = 1 TO n - 1
+100   FOR j = i + 1 TO n
+110    IF a(i) = a(j) THEN PRINT "Match at pos "; i; " and "; j
+120    pasos=pasos+1   
+130   NEXT j
+140 NEXT i
+
+170 PRINT "------------------"
+180 PRINT "Process finished in ";pasos; " steps"

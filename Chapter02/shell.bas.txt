@@ -1,0 +1,44 @@
+10 REM --- PERFORMANCE LAB: SHELL SORT ---
+15 RUN AT 3: REM Set the Z80 to 28 MHz.
+20  LET n = 300
+30  DIM a(n)
+40  REM CALL THE FUNCTION THAT GENERATES RANDOM NUMBERS
+50  PROC genRand(n)
+60  PRINT "Sorting "; n; " elements..."
+70 LET tinicio= TIME
+80 REM CALL THE SORTING FUNCTION
+90  PROC shellSort(n)
+100 LET tfinal = TIME
+120 LET transcurrido = (tfinal - tinicio) / 50
+130 PRINT "Completed in ";transcurrido;" seconds."
+140 REM --- CHECK WHETHER THE ARRAY IS SORTED ---
+145 LET OK = 1
+150 FOR i=1 TO n-1
+160 IF a(i) > a(i+1) THEN LET OK =0
+170 NEXT i
+180 IF OK=1 THEN PRINT "Array correctly sorted.": ELSE PRINT "Sorting error."
+200 PAUSE 0: STOP
+
+2000 DEFPROC genRand(n)
+2010   LOCAL i
+2020   FOR i = 1 TO n: LET a(i) = INT(RND * 1000): NEXT i
+2030 ENDPROC
+
+4000 DEFPROC shellSort(n)
+4010   LOCAL g, i, j, t
+4020   LET g = INT(n / 2): REM Set the initial gap
+4030   REPEAT : WHILE g > 0
+4040     FOR i = g + 1 TO n
+4050       LET t = a(i)
+4060       LET j = i
+4070       REPEAT
+4080         WHILE j > g
+4090         WHILE a(j - g) > t
+4100         LET a(j) = a(j - g)
+4110         LET j = j - g
+4120       REPEAT UNTIL 0
+4130       LET a(j) = t
+4140     NEXT i
+4150     LET g = INT(g / 2)
+4160   REPEAT UNTIL 0
+4170 ENDPROC
